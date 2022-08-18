@@ -50,7 +50,7 @@ void GodotStep3D::_populate_island(GodotBody3D *p_body, LocalVector<GodotBody3D 
 
 	for (const KeyValue<GodotConstraint3D *, int> &E : p_body->get_constraint_map()) {
 		GodotConstraint3D *constraint = const_cast<GodotConstraint3D *>(E.key);
-		if (constraint->get_island_step() == _step) {
+		if (constraint && constraint->get_island_step() == _step) {
 			continue; // Already processed.
 		}
 		constraint->set_island_step(_step);

@@ -513,6 +513,10 @@ void NavMap::remove_agent_as_controlled(RvoAgent *agent) {
 
 void NavMap::sync() {
 	// Check if we need to update the links.
+	if (!regions.size()) {
+		return;
+	}
+
 	if (regenerate_polygons) {
 		for (uint32_t r = 0; r < regions.size(); r++) {
 			regions[r]->scratch_polygons();

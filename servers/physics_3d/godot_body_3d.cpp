@@ -711,7 +711,7 @@ void GodotBody3D::integrate_velocities(real_t p_step) {
 
 	if (!Math::is_zero_approx(ang_vel)) {
 		Vector3 ang_vel_axis = total_angular_velocity / ang_vel;
-		Basis rot(ang_vel_axis, ang_vel * p_step);
+		Basis rot(ang_vel_axis.normalized(), ang_vel * p_step);
 		Basis identity3(1, 0, 0, 0, 1, 0, 0, 0, 1);
 		transform.origin += ((identity3 - rot) * transform.basis).xform(center_of_mass_local);
 		transform.basis = rot * transform.basis;
