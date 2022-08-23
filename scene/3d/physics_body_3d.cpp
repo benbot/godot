@@ -497,11 +497,6 @@ void RigidDynamicBody3D::_body_state_changed(PhysicsDirectBodyState3D *p_state) 
 	set_ignore_transform_notification(true);
 	set_global_transform(p_state->get_transform());
 
-	linear_velocity = p_state->get_linear_velocity();
-	angular_velocity = p_state->get_angular_velocity();
-
-	inverse_inertia_tensor = p_state->get_inverse_inertia_tensor();
-
 	if (sleeping != p_state->is_sleeping()) {
 		sleeping = p_state->is_sleeping();
 		emit_signal(SceneStringNames::get_singleton()->sleeping_state_changed);
@@ -525,7 +520,7 @@ void RigidDynamicBody3D::_body_state_changed(PhysicsDirectBodyState3D *p_state) 
 		}
 
 		_RigidDynamicBodyInOut *toadd = (_RigidDynamicBodyInOut *)alloca(p_state->get_contact_count() * sizeof(_RigidDynamicBodyInOut));
-		int toadd_count = 0; //state->get_contact_count();
+		int toadd_count = 0;
 		RigidDynamicBody3D_RemoveAction *toremove = (RigidDynamicBody3D_RemoveAction *)alloca(rc * sizeof(RigidDynamicBody3D_RemoveAction));
 		int toremove_count = 0;
 
@@ -536,8 +531,6 @@ void RigidDynamicBody3D::_body_state_changed(PhysicsDirectBodyState3D *p_state) 
 			ObjectID obj = p_state->get_contact_collider_id(i);
 			int local_shape = p_state->get_contact_local_shape(i);
 			int shape = p_state->get_contact_collider_shape(i);
-
-			//bool found=false;
 
 			HashMap<ObjectID, BodyState>::Iterator E = contact_monitor->body_map.find(obj);
 			if (!E) {
