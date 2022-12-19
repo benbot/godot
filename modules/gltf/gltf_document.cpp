@@ -5609,9 +5609,11 @@ void GLTFDocument::_generate_scene_node(Ref<GLTFState> p_state, Node *scene_pare
 		scene_parent = bone_attachment;
 	}
 	// Check if any GLTFDocumentExtension classes want to generate a node for us.
+	bool should_skip_add_to_scene = false;
 	for (Ref<GLTFDocumentExtension> ext : document_extensions) {
 		ERR_CONTINUE(ext.is_null());
 		current_node = ext->generate_scene_node(p_state, gltf_node, scene_parent);
+		should_skip_add_to_scene = ext->should_skip_add_to_scene();
 		if (current_node) {
 			break;
 		}
@@ -5629,19 +5631,28 @@ void GLTFDocument::_generate_scene_node(Ref<GLTFState> p_state, Node *scene_pare
 		}
 	}
 	// Add the node we generated and set the owner to the scene root.
-	scene_parent->add_child(current_node, true);
-	if (current_node != scene_root) {
-		Array args;
-		args.append(scene_root);
-		current_node->propagate_call(StringName("set_owner"), args);
-	}
-	current_node->set_transform(gltf_node->xform);
-	current_node->set_name(gltf_node->get_name());
+	if (!should_skip_add_to_scene) {
+		scene_parent->add_child(current_node, true);
+		if (current_node != scene_root) {
+			Array args;
+			args.append(scene_root);
+			current_node->propagate_call(StringName("set_owner"), args);
+		}
+		current_node->set_transform(gltf_node->xform);
+		current_node->set_name(gltf_node->get_name());
 
-	p_state->scene_nodes.insert(node_index, current_node);
+		p_state->scene_nodes.insert(node_index, current_node);
+	}
 
 	for (int i = 0; i < gltf_node->children.size(); ++i) {
 		_generate_scene_node(p_state, current_node, scene_root, gltf_node->children[i]);
+	}
+
+	for (Ref<GLTFDocumentExtension> ext : document_extensions) {
+		ERR_CONTINUE(ext.is_null());
+		if (ext->is_dirty()) {
+			ext->clean();
+		}
 	}
 }
 

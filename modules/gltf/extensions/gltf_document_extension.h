@@ -54,6 +54,13 @@ public:
 	virtual Error export_node(Ref<GLTFState> p_state, Ref<GLTFNode> p_gltf_node, Dictionary &r_json, Node *p_node);
 	virtual Error export_post(Ref<GLTFState> p_state);
 
+	// Hooks for controlling generation behavior
+	virtual void clean() {}
+	virtual bool is_dirty() {
+		return false;
+	}
+	virtual bool should_skip_add_to_scene() { return false; }
+
 	// Import process.
 	GDVIRTUAL2R(int, _import_preflight, Ref<GLTFState>, Vector<String>);
 	GDVIRTUAL0R(Vector<String>, _get_supported_extensions);
